@@ -9,10 +9,28 @@ getResults(
   fertility = "1-2",
   soil = "mineral",
   with_re = TRUE,
-  err_model = "A",
+  err_model = "M",
   nat = FALSE,
-  long = FALSE
+  long = FALSE,
+  id
 )
+}
+\arguments{
+\item{zone}{which zone}
+
+\item{fertility}{which f'ty}
+
+\item{soil}{etc}
+
+\item{with_re}{model with plot-wise random intercepts? (default: TRUE)}
+
+\item{err_model}{default: M. Additive or Multiplicative error model}
+
+\item{nat}{return the derived "interpretable" parameters? (default: FALSE)}
+
+\item{long}{wide (FALSE) or long (TRUE) format tibble.}
+
+\item{id}{this/these particular results by id}
 }
 \description{
 Get specific results. The results will be returned as a tibble.

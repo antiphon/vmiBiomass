@@ -17,7 +17,7 @@ evalGompertz(x, id, l = FALSE, deriv = FALSE, mc = 0, level = 0.975)
 
 \item{mc}{If > 1, sample posterior (approximated by mv-normal) of the parameters, evaluate function, and compute pointwise envelopes.}
 
-\item{level}{if mc > 1, the 100xlevel\% envelopes are returned alongside the mean.}
+\item{level}{if mc > 1, the 100xlevel\% envelopes are returned alongside the mean. Recommend using > 1000.}
 }
 \description{
 Evaluate Estimated Gompertz

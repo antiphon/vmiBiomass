@@ -37,6 +37,15 @@
 #'
 #' Get specific results. The results will be returned as a tibble.
 #'
+#' @param zone which zone
+#' @param fertility which f'ty
+#' @param soil etc
+#' @param with_re model with plot-wise random intercepts? (default: TRUE)
+#' @param err_model default: M. Additive or Multiplicative error model
+#' @param nat return the derived "interpretable" parameters? (default: FALSE)
+#' @param long wide (FALSE) or long (TRUE) format tibble.
+#' @param id this/these particular results by id
+#'
 #' @seealso \link[vmiBiomass]{results}, \link[vmiBiomass]{lookup}
 #' @import dplyr tidyr
 #' @export
@@ -44,16 +53,18 @@ getResults <- function(zone = "SOUTH",
                        fertility = "1-2",
                        soil = "mineral",
                        with_re = TRUE,
-                       err_model = "A",
+                       err_model = "M",
                        nat = FALSE,
-                       long = FALSE) {
+                       long = FALSE,
+                       id) {
   data(results, package = "vmiBiomass")
-
-  sub <- lookup %>% dplyr::filter( zone %in% !!zone &
+  if(!is.missing(sub))
+    sub <- lookup %>% dplyr::filter( zone %in% !!zone &
                              fertility %in% !!fertility &
                              soil %in% !!soil &
                              with_ranefs %in% with_re &
                                err_model %in% !!err_model)
+  else sub <- lookup %>% dplyr::filter(id %in% !!id)
   if(nrow(sub) == 0) return(NULL)
   tabu <- NULL
   for(id1 in sub$id) {
