@@ -3,7 +3,7 @@
 
 library(tibble)
 
-infiles <- dir("../../results_rds/", full.names = TRUE)
+infiles <- dir("../../results_rds-v3/", full.names = TRUE)
 
 # the format is
 # ..._gombertz_A-M_[RE_]_NORTH.<fertility>.<soil>-sqrtw6k_summary.rds
@@ -15,7 +15,7 @@ infiles <- dir("../../results_rds/", full.names = TRUE)
 # for sorting factors
 vlevs <- c("NORTH", "MIDDLE", "SOUTH")
 # soil in english please
-soil_en <- cbind(c("mineraalimaa", "ojitettu suo", "ojittamaton suo"), c("mineral", "drained peatl.", "natural peatl.") )
+soil_en <- cbind(c("mineraalimaa", "ojitettu suo", "ojittamaton suo"), c("mineral", "drained peatl.", "undrained peatl.") )
 # fertility was in numbered classes
 kptlevs <-c("Lehdot_lehKankaat", "Tuoreet kankaat", "Kuivahkot kankaat", "KuivatKank_KaruKank_Kallio_laki")
 kptnums <- c("1-2", "3", "4", "5-8")
