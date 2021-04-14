@@ -1,0 +1,129 @@
+---
+title: "Basic functions for retreaving results"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{basics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(vmiBiomass)
+library(dplyr)
+library(ggplot2)
+
+```
+
+# Introduction
+
+The package contains the estimated parameters, and their uncertainties, for the 36 curve estimates for the paper "Age-dependence of stand biomass in managed boreal forests based on the Finnish National Forest Inventory data" by Repo et al 2021.
+
+The idea is to connect biomass of a forest plot with its (estimated) age. A parametric function is chosen to model the connection. Based on initial screening, we chose the Gompertz-function, using the parametrisation
+
+$$f(x) = a + A\exp[-mk^x]$$
+
+- $a$: Nugget effect
+- $A$: upper asymptote
+- $m$: lag parameter
+- $k$: growth rate
+
+
+The response variable for each group $g=1,...,36$ is biomass $y_{si}$, grouped within stands $s$. 
+
+For each group, four versions were fitted. 
+
+1. Additive model "A": $$y_{si}\sim N(f(age_{si}), \sigma_{e}^2)$$
+2. Additive model with stand-wise random effect "A + re": $$y_{si}\sim N(u_s +f(age_{si}), \sigma_{e}^2)$$ with $u_s\sim N(0, \sigma_s^2)$
+3. Multiplicative model "M": $$\log(y_{si})\sim N(\log[f(age_{si})], \sigma_{e}^2)$$
+4. Multiplicative model with stand-wise random effect "M + re": $$\log(y_{si})\sim N(\log[f(age_{si})] + u_s, \sigma_{e}^2)$$ with $u_s\sim N(0, \sigma_s^2)$
+
+
+All results are included in this package. The priors are available in the code, see next section.
+
+# The Stan-model code
+The models were fitted using the package `rstan`. The model code is available in text-objects, e.g.
+
+```{r}
+cat(mMre.stan)
+```
+
+For more information, see `?mA.stan`.
+
+
+# Retrieving parameter estimates
+
+The posterior estimates for the parameters results are stored in named-list. The group-information is stored in the object `lookup` 
+
+```{r}
+head(lookup)
+```
+from which the package-wide group-identifier `id` can be read for any group and used for retrieving specific results. For example,
+
+```{r}
+l1 <- lookup %>% filter(region == "SOUTH" & soil == "mineral" & fertility == "4" &
+                    err_model == "M" &with_ranefs == TRUE)
+l1
+```
+
+Then we can use
+
+```{r}
+r1 <- getParameters(id = l1$id)
+head(r1)
+```
+
+A shortcut is 
+
+```{r}
+r1 <- getParameters(region = "SOUTH", soil = "mineral", fertility = "4", err_model = "M", with_re = TRUE)
+```
+
+See the documentation for `getResults` for more information.
+
+# Retrieving curve estimates
+
+To get posterior estimates of the curves on the range $[0,200]y$:
+
+```{r}
+c1 <- getCurves(region = "SOUTH", soil = "mineral", fertility = "4", with_re = TRUE, err_model = c("A", "M"))
+```
+The age is in centuries.
+```{r, fig.width=9}
+c1 %>% ggplot(aes(x * 100, mean)) +
+  geom_ribbon(aes(ymin = `2.5%`, ymax = `97.5%`, fill = err_model), alpha = .5) +
+  geom_line(aes(col = err_model))
+```
+
+Note that due to the non-linear nature of the curve, there is a slight discrepancy between the posterior curves and the curve at the posterior parameters:
+
+```{r, fig.width=9}
+c1_1 <- getCurves(id = l1$id, log_scale = TRUE)
+c1_2 <- evalGompertz(id = l1$id, log_scale = TRUE, x = c1_1$x)
+
+bind_rows(c1_1 %>% mutate(m = "posterior mean curve"),
+          c1_2 %>% mutate(m = "curve at posterior mean")) %>%
+  ggplot( aes(x, mean, col = m)) + 
+  geom_line()
+
+```
+
+# Retrieving everything
+
+All stored information, at the moment undocumented, is available in the `results`-object, for example the posterior covariance of parameter estimates:
+
+```{r}
+res1 <- results[[ l1$id ]]
+res1$est$Cov
+```
+
+```{r}
+str(res1, 1)
+```
+

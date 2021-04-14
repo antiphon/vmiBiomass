@@ -1,4 +1,3 @@
-
 #' Results Object
 #'
 #' Results for the biomass curve fitting. Gompertz curve.
@@ -26,30 +25,30 @@
 #'  \item{id}{unique identifier (key) for matching with results-object components}
 #'  \item{with_ranefs}{does this result include random effects in its model?}
 #'  \item{err_model}{"A"dditive or "M"ultiplicative.}
-#'  \item{zone, fertility, soil}{the group information}
+#'  \item{region, fertility, soil}{the grouping variables}
 #' }
 #' @seealso \link[vmiBiomass]{getResults}, \link[vmiBiomass]{results}
 "lookup"
 
 
 
-#' Get Estimates of Particular VMI Biomass Experiment Groups in Long Format
+#' Get Estimated Gompertz Parameters of Particular VMI Biomass Experiment Groups in Long Format
 #'
-#' Get specific results. The results will be returned as a tibble.
+#' Get specific results. The results will be returned as a table.
 #'
-#' @param zone which zone
-#' @param fertility which f'ty
-#' @param soil etc
+#' @param region which region: SOUTH, MIDDLE, NORTH
+#' @param fertility which fertility class: "1-2", "3", "4", "5-8"
+#' @param soil which soil type: mineral, "drained peatl.", "undrained peatl."
 #' @param with_re model with plot-wise random intercepts? (default: TRUE)
-#' @param err_model default: M. Additive or Multiplicative error model
+#' @param err_model default: M. Additive or Multiplicative error model?
 #' @param nat return the derived "interpretable" parameters? (default: FALSE)
-#' @param long wide (FALSE) or long (TRUE) format tibble.
-#' @param id this/these particular results by id
+#' @param long Return type: wide (FALSE) or long (TRUE) format tibble.
+#' @param id this/these particular results by internal identifier (see \link{lookup})
 #'
 #' @seealso \link[vmiBiomass]{results}, \link[vmiBiomass]{lookup}
 #' @import dplyr tidyr
 #' @export
-getResults <- function(zone = "SOUTH",
+getParameters <- function(region = "SOUTH",
                        fertility = "1-2",
                        soil = "mineral",
                        with_re = TRUE,
@@ -58,18 +57,19 @@ getResults <- function(zone = "SOUTH",
                        long = FALSE,
                        id) {
   data(results, package = "vmiBiomass")
-  if(!is.missing(sub))
-    sub <- lookup %>% dplyr::filter( zone %in% !!zone &
-                             fertility %in% !!fertility &
-                             soil %in% !!soil &
-                             with_ranefs %in% with_re &
-                               err_model %in% !!err_model)
+  if(missing(id))
+    sub <- lookup %>%
+      dplyr::filter( region %in% !!region &
+                       fertility %in% !!fertility &
+                       soil %in% !!soil &
+                       with_ranefs %in% with_re &
+                       err_model %in% !!err_model)
   else sub <- lookup %>% dplyr::filter(id %in% !!id)
   if(nrow(sub) == 0) return(NULL)
   tabu <- NULL
   for(id1 in sub$id) {
     i <- sub %>% dplyr::filter(id == id1)
-#    browser()
+    #browser()
     r <- results[[id1]]
     e <- if(nat) r$estnat else r$est
     st <- e$stat
@@ -82,5 +82,49 @@ getResults <- function(zone = "SOUTH",
 }
 
 
+
+#' Get Posterior Mean Curve of Particular VMI Biomass Experiment Groups in Long Format
+#'
+#' Get specific results. The results will be returned as a table
+#'
+#' @param region which region: SOUTH, MIDDLE, NORTH
+#' @param fertility which fertility class: "1-2", "3", "4", "5-8"
+#' @param soil which soil type: mineral, "drained peatl.", "undrained peatl."
+#' @param with_re model with plot-wise random intercepts? (default: TRUE)
+#' @param err_model default: M. Additive or Multiplicative error model?
+#' @param log_scale return the curve in log-scale?
+#' @param id this/these particular results by internal identifier (see \link{lookup})
+#'
+#' @seealso \link[vmiBiomass]{results}, \link[vmiBiomass]{lookup}
+#' @import dplyr tidyr
+#' @export
+getCurves <- function(region = "SOUTH",
+                          fertility = "1-2",
+                          soil = "mineral",
+                          with_re = TRUE,
+                          err_model = "M",
+                          log_scale = TRUE,
+                          id) {
+  data(results, package = "vmiBiomass")
+  if(missing(id))
+    sub <- lookup %>%
+      dplyr::filter( region %in% !!region &
+                       fertility %in% !!fertility &
+                       soil %in% !!soil &
+                       with_ranefs %in% with_re &
+                       err_model %in% !!err_model)
+  else sub <- lookup %>% dplyr::filter(id %in% !!id)
+  if(nrow(sub) == 0) return(NULL)
+  tabu <- NULL
+  for(id1 in sub$id) {
+    i <- sub %>% dplyr::filter(id == id1)
+    #browser()
+    r <- results[[id1]]
+    e <- if(log_scale) r$lenv else r$env
+    d <- cbind(i, e)
+    tabu <- tabu %>% rbind(d)
+  }
+  tabu
+}
 
 

@@ -10,7 +10,7 @@ a tibble with one info-line per fitted group:
  \item{id}{unique identifier (key) for matching with results-object components}
  \item{with_ranefs}{does this result include random effects in its model?}
  \item{err_model}{"A"dditive or "M"ultiplicative.}
- \item{zone, fertility, soil}{the group information}
+ \item{region, fertility, soil}{the grouping variables}
 }
 }
 \usage{

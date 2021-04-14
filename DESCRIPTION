@@ -1,11 +1,17 @@
 Package: vmiBiomass
 Type: Package
-Title: Supplement to VMI Biomass Paper 
-Version: 0.1.0
+Title: Supplemental Package for Repo et. al. 2021
+Version: 0.3
 Author: Tuomas Rajala
 Maintainer: Tuomas Rajala <tuomas.rajala@iki.fi>
-Description: Model fitting scripts and result objects for our paper . 
+Description: Model fitting scripts and result objects for the paper
+ Repo et al. "Age-dependence of stand biomass in managed boreal forests 
+ abased on the Finnish National Forest Inventory data"
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

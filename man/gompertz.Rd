@@ -4,16 +4,16 @@
 \alias{gompertz}
 \title{Gompertz Curve}
 \usage{
-gompertz(t, p)
+gompertz(x, p)
 }
 \arguments{
-\item{p}{parameters, as c(A,m,k) (see details).}
-
 \item{x}{argument}
+
+\item{p}{parameters, as c(A,m,k) (see details).}
 }
 \description{
 Gompertz Curve
 }
 \details{
-The Gompertz parametric curve we used is \deqn{G(t) = A * exp(-m*k^t)}.
+The Gompertz parametric curve we used is \deqn{G(t) = A * exp(-m*k^x)}.
 }

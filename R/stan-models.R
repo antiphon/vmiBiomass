@@ -2,23 +2,23 @@
 #'
 #' @examples
 #' #not run
-#' # dat1: data for one group
-#' modA <- stan_model( model_code = m1.stan , verbose=TRUE)
+#' # dat1: data-frame for one group
+#' modA <- stan_model( model_code = mA.stan , verbose=TRUE)
 #' fitA <- sampling(modA,
 #'                  data =
 #'        list( n = nrow(dat1),
 #'              p = length(unique(dat1$group)),
 #'              group = dat1$group, # soiltype x zone x fertility class
-#'              ika = dat1$age,
-#'              biomassa = dat1$biomass,
-#'              weight = 1/sqrt(dat1$area),
+#'              age = dat1$age,
+#'              biomass = dat1$biomass,
+#'              weight = dat1$weight/sum(dat1$weight) * nrow(dat1),
 #'              nug_var = 10),
 #' verbose = FALSE,
 #' cores = 4,
 #' iter=6000)
 #'
 #' @export
-m1.stan <- "
+mA.stan <- "
 data {
   int n;
   int p;
@@ -37,19 +37,19 @@ parameters{
 model{
   A ~ normal(100, 50);
   k ~ beta(0.5, 1);
-  sigma_err ~ inv_gamma(0.01, 0.01);
+  sigma_err ~ exponential(.1);
   nugget ~ normal(0, nug_var);
   m ~normal(0, 1);
   for(i in 1:n) {
-    biomassa[i] ~ normal(nugget + A * exp( -m * k^ika[i] ), sigma_err * weight[i]);
+    target += normal_lpdf(biomassa[i] | nugget + A * exp( -m * k^ika[i] ), sigma_err) * weight[i];
   }
 }
 "
 
 #' The additive error-model with RE's
-#' @seealso \link{m1.stan}
+#' @seealso \link{mA.stan}
 #' @export
-m1re.stan <- "
+mAre.stan <- "
 data {
   int n;
   int p;
@@ -71,13 +71,13 @@ parameters{
 model{
   A ~ normal(100, 50);
   k ~ beta(0.5, 1);
-  sigma_err ~ inv_gamma(0.01, 0.01);
-  sigma_ran ~ inv_gamma(0.01, 0.01);
+  sigma_err ~ exponential(.1);
+  sigma_ran ~ exponential(.1);
   nugget ~ normal(0, nug_var);
   m ~normal(0, 1);
   ran ~ normal(0, sigma_ran);
   for(i in 1:n) {
-    biomassa[i] ~ normal(nugget + A * exp( -m * k^ika[i] ) + ran[ group[i] ], sigma_err * weight[i]);
+    target += normal_lpdf(biomassa[i] | nugget + A * exp( -m * k^ika[i] ) + ran[ group[i] ], sigma_err) * weight[i];
   }
 }
 "
@@ -87,9 +87,9 @@ model{
 
 #' The multiplicative error-model without RE's
 #'
-#' @seealso \link{m1.stan}
+#' @seealso \link{mA.stan}
 #' @export
-m3.stan <- "
+mM.stan <- "
 data {
   int n;
   int p;
@@ -108,20 +108,20 @@ parameters{
 model{
   A ~ normal(100, 50);
   k ~ beta(0.5, 1);
-  sigma_err ~ inv_gamma(0.01, 0.01);
+  sigma_err ~ exponential(1);
   nugget ~ normal(0, nug_var);
   m ~normal(0, 1);
   for(i in 1:n) {
-    log(biomassa[i]) ~ normal( log( nugget + A * exp( -m * k^ika[i] )), sigma_err * weight[i]);
+    target += normal_lpdf(log(biomassa[i]) | log(nugget + A * exp( -m * k^ika[i] )), sigma_err) * weight[i];
   }
 }
 "
 
 #' The multiplicative error-model with RE's
 #'
-#' @seealso \link{m1.stan}
+#' @seealso \link{mM.stan}
 #' @export
-m3re.stan <- "
+mMre.stan <- "
 data {
   int n;
   int p;
@@ -143,13 +143,13 @@ parameters{
 model{
   A ~ normal(100, 50);
   k ~ beta(0.5, 1);
-  sigma_err ~ inv_gamma(0.01, 0.01);
-  sigma_ran ~ inv_gamma(0.01, 0.01);
+  sigma_err ~ exponential(1);
+  sigma_ran ~ exponential(1);
   nugget ~ normal(0, nug_var);
   m ~normal(0, 1);
   ran ~ normal(0, sigma_ran);
   for(i in 1:n) {
-    log(biomassa[i]) ~ normal( log( nugget + A * exp( -m * k^ika[i] )) + ran[ group[i] ], sigma_err * weight[i]);
+    target += normal_lpdf(log(biomassa[i]) | log(nugget + A * exp( -m * k^ika[i] )) + ran[ group[i] ], sigma_err) * weight[i];
   }
 }
 "

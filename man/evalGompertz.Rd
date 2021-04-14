@@ -4,14 +4,21 @@
 \alias{evalGompertz}
 \title{Evaluate Estimated Gompertz}
 \usage{
-evalGompertz(x, id, l = FALSE, deriv = FALSE, mc = 0, level = 0.975)
+evalGompertz(
+  x = seq(0, 2, l = 101),
+  id,
+  log_scale = TRUE,
+  deriv = FALSE,
+  mc = 0,
+  level = 0.95
+)
 }
 \arguments{
 \item{x}{argument (age in centuries) vector at which to evaluate the function}
 
 \item{id}{the estimate identifier}
 
-\item{l}{in log-scale?}
+\item{log_scale}{in log-scale?}
 
 \item{deriv}{derivate instead?}
 
@@ -20,7 +27,7 @@ evalGompertz(x, id, l = FALSE, deriv = FALSE, mc = 0, level = 0.975)
 \item{level}{if mc > 1, the 100xlevel\% envelopes are returned alongside the mean. Recommend using > 1000.}
 }
 \description{
-Evaluate Estimated Gompertz
+Evaluate the curve at posterior mean of the parameter.
 }
 \details{
 Note that the posterior envelope will be a bit off since the joined posterior is most likely not gaussian.

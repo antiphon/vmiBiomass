@@ -4,10 +4,10 @@
 \alias{gompertzDeriv}
 \title{Derivative of Gompertz Curve}
 \usage{
-gompertzDeriv(t, p)
+gompertzDeriv(x, p)
 }
 \arguments{
-\item{t}{argument}
+\item{x}{argument}
 
 \item{p}{parameters, as c(A,m,k) (see details).}
 }
