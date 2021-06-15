@@ -35,8 +35,8 @@ gompertzDeriv <- function(x, p) {
 #' @param id the estimate identifier
 #' @param log_scale in log-scale?
 #' @param deriv derivate instead?
-#' @param mc If > 1, sample posterior (approximated by mv-normal) of the parameters, evaluate function, and compute pointwise envelopes.
-#' @param level if mc > 1, the 100xlevel\% envelopes are returned alongside the mean. Recommend using > 1000.
+#' @param mc If > 1, sample posterior (approximated by mv-normal) of the parameters, evaluate function, and compute pointwise envelopes. Recommend using > 1000.
+#' @param level if mc > 1, the 100xlevel\% envelopes are returned alongside the mean.
 #' @details
 #' Note that the posterior envelope will be a bit off since the joined posterior is most likely not gaussian.
 #' @import mvtnorm dplyr

@@ -22,9 +22,9 @@ evalGompertz(
 
 \item{deriv}{derivate instead?}
 
-\item{mc}{If > 1, sample posterior (approximated by mv-normal) of the parameters, evaluate function, and compute pointwise envelopes.}
+\item{mc}{If > 1, sample posterior (approximated by mv-normal) of the parameters, evaluate function, and compute pointwise envelopes. Recommend using > 1000.}
 
-\item{level}{if mc > 1, the 100xlevel\% envelopes are returned alongside the mean. Recommend using > 1000.}
+\item{level}{if mc > 1, the 100xlevel\% envelopes are returned alongside the mean.}
 }
 \description{
 Evaluate the curve at posterior mean of the parameter.

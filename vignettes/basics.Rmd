@@ -1,6 +1,7 @@
 ---
 title: "Basic functions for retreaving results"
 output: rmarkdown::html_vignette
+code_folding: true
 vignette: >
   %\VignetteIndexEntry{basics}
   %\VignetteEngine{knitr::rmarkdown}
@@ -116,7 +117,16 @@ bind_rows(c1_1 %>% mutate(m = "posterior mean curve"),
 
 # Retrieving everything
 
-All stored information, at the moment undocumented, is available in the `results`-object, for example the posterior covariance of parameter estimates:
+All stored information from the fitting is available in the `results`-object, with meta given in `lookup`.  
+
+
+```{r}
+print( lookup[1,] )
+# see: ?results
+names(results$id000001)
+```
+
+An example of accessing the posterior covariance of parameter estimates:
 
 ```{r}
 res1 <- results[[ l1$id ]]
